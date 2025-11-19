@@ -4,26 +4,23 @@
     <div class="auth-card">
       
       <!-- Título -->
-      <h2 class="auth-title">REGISTRARSE</h2>
+      <h2 class="auth-title">INICIAR SESIÓN</h2>
 
       <!-- Formulario -->
-      <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+      <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         
-        <!-- Email -->
+        <!-- Usuario o Email -->
         <div class="form-group mb-3">
-          <label for="email" class="form-label">Dirección de correo electrónico</label>
+          <label for="username" class="form-label">Nombre de usuario o correo electrónico</label>
           <input 
-            type="email" 
+            type="text" 
             class="form-control" 
-            id="email"
-            formControlName="email"
-            [class.is-invalid]="registerForm.get('email')?.invalid && registerForm.get('email')?.touched"
+            id="username"
+            formControlName="username"
+            [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
           >
-          <div class="invalid-feedback" *ngIf="registerForm.get('email')?.errors?.['required'] && registerForm.get('email')?.touched">
-            Por favor ingresa tu correo electrónico
-          </div>
-          <div class="invalid-feedback" *ngIf="registerForm.get('email')?.errors?.['email'] && registerForm.get('email')?.touched">
-            Por favor ingresa un correo válido
+          <div class="invalid-feedback" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+            Por favor ingresa tu usuario o correo electrónico
           </div>
         </div>
 
@@ -35,60 +32,48 @@
             class="form-control" 
             id="password"
             formControlName="password"
-            [class.is-invalid]="registerForm.get('password')?.invalid && registerForm.get('password')?.touched"
+            [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
           >
-          <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['required'] && registerForm.get('password')?.touched">
-            Por favor ingresa una contraseña
-          </div>
-          <div class="invalid-feedback" *ngIf="registerForm.get('password')?.errors?.['minlength'] && registerForm.get('password')?.touched">
-            La contraseña debe tener al menos 6 caracteres
+          <div class="invalid-feedback" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+            Por favor ingresa tu contraseña
           </div>
         </div>
 
-        <!-- Información de Privacidad -->
-        <div class="privacy-info mb-3">
-          <p class="privacy-text">
-            Tus datos personales se utilizarán para procesar tu pedido, mejorar tu 
-            experiencia en esta web y otros propósitos descritos en nuestra 
-            <a href="#" class="privacy-link">política de privacidad</a>.
-          </p>
-        </div>
-
-        <!-- Términos y Condiciones -->
-        <div class="form-check mb-4">
+        <!-- Recordarme -->
+        <div class="form-check mb-3">
           <input 
             class="form-check-input" 
             type="checkbox" 
-            id="acceptTerms"
-            formControlName="acceptTerms"
-            [class.is-invalid]="registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched"
+            id="remember"
+            formControlName="rememberMe"
           >
-          <label class="form-check-label" for="acceptTerms">
-            He leído y acepto los <a href="#" class="terms-link">Términos y Condiciones</a> y 
-            <a href="#" class="terms-link">Política de Privacidad</a>
+          <label class="form-check-label" for="remember">
+            Recuérdame
           </label>
-          <div class="invalid-feedback d-block" *ngIf="registerForm.get('acceptTerms')?.invalid && registerForm.get('acceptTerms')?.touched">
-            Debes aceptar los términos y condiciones
-          </div>
         </div>
 
-        <!-- Botón Registrarse -->
+        <!-- Botón Ingresar -->
         <button 
           type="submit" 
           class="btn btn-auth-primary w-100 mb-3"
-          [disabled]="registerForm.invalid"
+          [disabled]="loginForm.invalid"
         >
-          REGISTRARSE
+          INGRESAR
         </button>
+
+        <!-- Olvidé mi contraseña -->
+        <div class="text-center">
+          <a href="#" class="forgot-password">¿Olvidaste la contraseña?</a>
+        </div>
 
         <!-- Separador -->
         <div class="auth-divider">
           <span>O</span>
         </div>
 
-        <!-- Enlace a Login -->
+        <!-- Enlace a Registro -->
         <div class="text-center">
-          <p class="mb-0">¿Ya tienes una cuenta? <a routerLink="/auth/login" class="link-login">Inicia sesión aquí</a></p>
+          <p class="mb-0">¿No tienes una cuenta? <a routerLink="/auth/register" class="link-register">Regístrate aquí</a></p>
         </div>
 
       </form>
