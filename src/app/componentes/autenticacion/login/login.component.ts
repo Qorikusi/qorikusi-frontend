@@ -2,6 +2,7 @@ import { Component, OnInit } from '@angular/core';
 import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
+import { AuthService } from '../../../servicio/auth.service';
 
 @Component({
   selector: 'app-login',
@@ -16,7 +17,8 @@ export class LoginComponent implements OnInit {
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private authService: AuthService
   ) {}
 
   ngOnInit() {
@@ -29,17 +31,18 @@ export class LoginComponent implements OnInit {
 
   onSubmit() {
     if (this.loginForm.valid) {
-      const credentials = this.loginForm.value;
-      console.log('Login attempt:', credentials);
+      const { username, password } = this.loginForm.value;
       
-      // Aquí conectarás con tu servicio de autenticación
-      // this.authService.login(credentials).subscribe(...)
-      
-      // Simulación de login exitoso
-      alert('Login exitoso! Redirigiendo...');
-      this.router.navigate(['/']);
+      this.authService.login(username, password).subscribe({
+        next: (usuario) => {
+          alert('Login exitoso! Redirigiendo...');
+          this.router.navigate(['/']);
+        },
+        error: (error) => {
+          alert('Error en login: ' + error.message);
+        }
+      });
     } else {
-      // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.loginForm.controls).forEach(key => {
         this.loginForm.get(key)?.markAsTouched();
       });

@@ -127,14 +127,14 @@
           >
             <div class="product-card" [routerLink]="['/products', product.id]" style="cursor: pointer;">
               <div class="product-image">
-                <img [src]="product.image" [alt]="product.name" class="img-fluid">
+                <img [src]="product.imagen" [alt]="product.nombre" class="img-fluid">
                 <div class="product-overlay">
                   <button class="btn btn-quick-view" (click)="$event.stopPropagation()">Vista Rápida</button>
                 </div>
               </div>
               <div class="product-info">
-                <h5 class="product-name">{{ product.name }}</h5>
-                <p class="product-price">s/. {{ product.price | number:'1.2-2' }}</p>
+                <h5 class="product-name">{{ product.nombre }}</h5>
+                <p class="product-price">s/. {{ product.precio | number:'1.2-2' }}</p>
               </div>
             </div>
           </div>
@@ -144,14 +144,14 @@
           >
             <div class="product-card">
               <div class="product-image">
-                <img [src]="product.image" [alt]="product.name" class="img-fluid">
+                <img [src]="product.imagen" [alt]="product.nombre" class="img-fluid">
                 <div class="product-overlay">
                   <button class="btn btn-quick-view">Vista Rápida</button>
                 </div>
               </div>
               <div class="product-info">
-                <h5 class="product-name">{{ product.name }}</h5>
-                <p class="product-price">s/. {{ product.price | number:'1.2-2' }}</p>
+                <h5 class="product-name">{{ product.nombre }}</h5>
+                <p class="product-price">s/. {{ product.precio | number:'1.2-2' }}</p>
               </div>
             </div>
           </div> -->

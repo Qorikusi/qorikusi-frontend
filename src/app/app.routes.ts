@@ -3,27 +3,39 @@ import { Routes } from '@angular/router';
 export const routes: Routes = [
   {
     path: '',
-    loadComponent: () => import('./modules/home/pages/home/home.component').then(m => m.HomeComponent)
+    loadComponent: () => import('./componentes/home/home.component').then(m => m.HomeComponent)
   },
   {
     path: 'products',
-    loadChildren: () => import('./modules/products/products.routes').then(m => m.PRODUCTS_ROUTES)
+    loadComponent: () => import('./componentes/producto/listar-producto/product-list.component').then(m => m.ProductListComponent)
+  },
+  {
+    path: 'products/:id',
+    loadComponent: () => import('./componentes/producto/detalle-producto/product-detail.component').then(m => m.ProductDetailComponent)
   },
   {
     path: 'cart',
-    loadComponent: () => import('./modules/cart/pages/cart/cart.component').then(m => m.CartComponent)
+    loadComponent: () => import('./componentes/carrito/cart.component').then(m => m.CartComponent)
   },
   {
-    path: 'auth',
-    loadChildren: () => import('./modules/auth/auth.routes').then(m => m.AUTH_ROUTES)
+    path: 'auth/login',
+    loadComponent: () => import('./componentes/autenticacion/login/login.component').then(m => m.LoginComponent)
+  },
+  {
+    path: 'auth/register',
+    loadComponent: () => import('./componentes/autenticacion/registro/register.component').then(m => m.RegisterComponent)
   },
   {
     path: 'checkout',
-    loadComponent: () => import('./modules/checkout/pages/checkout/checkout.component').then(m => m.CheckoutComponent)
+    loadComponent: () => import('./componentes/checkout/checkout.component').then(m => m.CheckoutComponent)
   },
   {
     path: 'profile',
-    loadChildren: () => import('./modules/profile/profile.routes').then(m => m.PROFILE_ROUTES)
+    loadComponent: () => import('./componentes/perfil/perfil/profile.component').then(m => m.ProfileComponent)
+  },
+  {
+    path: 'profile/orders',
+    loadComponent: () => import('./componentes/perfil/pedidos/orders.component').then(m => m.OrdersComponent)
   },
   {
     path: '**',

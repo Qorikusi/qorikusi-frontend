@@ -345,15 +345,15 @@
           <div class="summary-products">
             <div class="summary-product" *ngFor="let item of orderItems">
               <div class="product-image">
-                <img [src]="item.product.image" [alt]="item.product.name" class="img-fluid">
-                <span class="quantity-badge">{{ item.quantity }}</span>
+                <img [src]="item.producto.imagen" [alt]="item.producto.nombre" class="img-fluid">
+                <span class="quantity-badge">{{ item.cantidad }}</span>
               </div>
               <div class="product-info">
-                <h6>{{ item.product.name }}</h6>
-                <p>s/. {{ item.product.price | number:'1.2-2' }}</p>
+                <h6>{{ item.producto.nombre }}</h6>
+                <p>s/. {{ item.producto.precio | number:'1.2-2' }}</p>
               </div>
               <div class="product-total">
-                <p>s/. {{ item.product.price * item.quantity | number:'1.2-2' }}</p>
+                <p>s/. {{ item.producto.precio * item.cantidad | number:'1.2-2' }}</p>
               </div>
             </div>
           </div>

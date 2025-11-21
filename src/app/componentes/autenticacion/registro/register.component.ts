@@ -29,17 +29,9 @@ export class RegisterComponent implements OnInit {
 
   onSubmit() {
     if (this.registerForm.valid) {
-      const userData = this.registerForm.value;
-      console.log('Register attempt:', userData);
-      
-      // Aquí conectarás con tu servicio de autenticación
-      // this.authService.register(userData).subscribe(...)
-      
-      // Simulación de registro exitoso
       alert('¡Registro exitoso! Redirigiendo al login...');
       this.router.navigate(['/auth/login']);
     } else {
-      // Marcar todos los campos como tocados para mostrar errores
       Object.keys(this.registerForm.controls).forEach(key => {
         this.registerForm.get(key)?.markAsTouched();
       });

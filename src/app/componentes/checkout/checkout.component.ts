@@ -3,18 +3,8 @@ import { CommonModule } from '@angular/common';
 import { FormBuilder, FormGroup, Validators, ReactiveFormsModule } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { FormsModule } from '@angular/forms';
-
-interface Product {
-  id: number;
-  name: string;
-  price: number;
-  image: string;
-}
-
-interface OrderItem {
-  product: Product;
-  quantity: number;
-}
+import { ItemCarrito } from '../../modelos/ItemCarrito';
+import { CarritoService } from '../../servicio/carrito.service';
 
 @Component({
   selector: 'app-checkout',
@@ -31,41 +21,25 @@ export class CheckoutComponent implements OnInit {
   selectedPaymentMethod: string = 'card';
   orderNumber: string = '';
   shippingCost: number = 15.00;
-
-  // Items del pedido (simulación)
-  orderItems: OrderItem[] = [
-    {
-      product: {
-        id: 1,
-        name: 'Collar Inti',
-        price: 180.00,
-        image: 'https://via.placeholder.com/80x80/f5f3f0/3d3d5c?text=Collar'
-      },
-      quantity: 2
-    },
-    {
-      product: {
-        id: 2,
-        name: 'Anillo Lunar',
-        price: 200.00,
-        image: 'https://via.placeholder.com/80x80/f5f3f0/3d3d5c?text=Anillo'
-      },
-      quantity: 1
-    }
-  ];
+  orderItems: ItemCarrito[] = [];
 
   constructor(
     private fb: FormBuilder,
-    private router: Router
+    private router: Router,
+    private carritoService: CarritoService
   ) {}
 
   ngOnInit() {
     this.initForms();
     this.generateOrderNumber();
+    this.loadOrderItems();
+  }
+
+  loadOrderItems() {
+    this.orderItems = this.carritoService.obtenerItems();
   }
 
   initForms() {
-    // Formulario de Envío
     this.shippingForm = this.fb.group({
       firstName: ['', [Validators.required]],
       lastName: ['', [Validators.required]],
@@ -77,7 +51,6 @@ export class CheckoutComponent implements OnInit {
       notes: ['']
     });
 
-    // Formulario de Pago
     this.paymentForm = this.fb.group({
       cardName: ['', [Validators.required]],
       cardNumber: ['', [Validators.required, Validators.minLength(16)]],
@@ -93,7 +66,6 @@ export class CheckoutComponent implements OnInit {
   selectPaymentMethod(method: string) {
     this.selectedPaymentMethod = method;
     
-    // Si no es tarjeta, limpiar validaciones del formulario de pago
     if (method !== 'card') {
       this.paymentForm.clearValidators();
       this.paymentForm.updateValueAndValidity();
@@ -102,7 +74,7 @@ export class CheckoutComponent implements OnInit {
 
   getSubtotal(): number {
     return this.orderItems.reduce((total, item) => 
-      total + (item.product.price * item.quantity), 0
+      total + (item.producto.precio * item.cantidad), 0
     );
   }
 
@@ -118,14 +90,12 @@ export class CheckoutComponent implements OnInit {
       window.scrollTo(0, 0);
     } else if (this.currentStep === 2) {
       if (this.selectedPaymentMethod === 'card' && this.paymentForm.invalid) {
-        // Marcar campos como tocados para mostrar errores
         Object.keys(this.paymentForm.controls).forEach(key => {
           this.paymentForm.get(key)?.markAsTouched();
         });
         return;
       }
       
-      // Procesar el pago
       this.processPayment();
     }
   }
@@ -139,14 +109,7 @@ export class CheckoutComponent implements OnInit {
 
   processPayment() {
     console.log('Procesando pago...');
-    console.log('Datos de envío:', this.shippingForm.value);
-    console.log('Método de pago:', this.selectedPaymentMethod);
     
-    if (this.selectedPaymentMethod === 'card') {
-      console.log('Datos de tarjeta:', this.paymentForm.value);
-    }
-    
-    // Simulación de pago exitoso
     setTimeout(() => {
       this.currentStep = 3;
       window.scrollTo(0, 0);
