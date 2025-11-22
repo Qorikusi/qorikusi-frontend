@@ -60,6 +60,62 @@
   }
 }
 
+/* ========================================
+   INPUT GROUP (ICONO DINÁMICO)
+   ======================================== */
+
+.input-group {
+  .input-group-text {
+    background-color: #f5f3f0;
+    border: 1px solid #d0d0d0;
+    border-right: none;
+    border-radius: 6px 0 0 6px;
+    padding: 0 15px;
+    
+    i {
+      color: #999;
+      transition: color 0.3s ease;
+      
+      &.text-primary {
+        color: #3d3d5c !important;
+      }
+      
+      &.fa-user-shield {
+        color: #d4af37;
+      }
+      
+      &.fa-envelope {
+        color: #0dcaf0;
+      }
+    }
+  }
+  
+  .form-control {
+    border-radius: 0 6px 6px 0;
+    border-left: none;
+    
+    &:focus {
+      border-left: none;
+    }
+  }
+}
+
+/* ========================================
+   FORM TEXT (AYUDA)
+   ======================================== */
+
+.form-text {
+  font-size: 0.8rem;
+  color: #6c757d;
+  margin-top: 5px;
+  display: block;
+  
+  i {
+    color: #0dcaf0;
+    font-size: 0.75rem;
+  }
+}
+
 .form-check {
   .form-check-input {
     border-color: #d0d0d0;
@@ -83,6 +139,10 @@
 
 .invalid-feedback {
   font-size: 0.85rem;
+  
+  &.d-block {
+    display: block;
+  }
 }
 
 /* ========================================
@@ -179,5 +239,9 @@
   
   .auth-title {
     font-size: 1.5rem;
+  }
+  
+  .form-text {
+    font-size: 0.75rem;
   }
 }

@@ -150,6 +150,7 @@ export class AuthService {
 
   /**
    * Manejo centralizado de errores HTTP
+   * ACTUALIZADO con mensajes más específicos según las validaciones del backend
    */
   private handleError(error: HttpErrorResponse) {
     let errorMessage = 'Ocurrió un error desconocido';
@@ -165,29 +166,52 @@ export class AuthService {
         case 'USER_ALREADY_EXISTS':
           errorMessage = 'El usuario ya existe';
           break;
+          
         case 'EMAIL_ALREADY_EXISTS':
           errorMessage = 'El correo electrónico ya está registrado';
           break;
+          
         case 'CLIENT_NOT_FOUND':
-          errorMessage = 'Cliente no encontrado';
+          errorMessage = 'No se encontró una cuenta con ese correo electrónico';
           break;
+          
         case 'INVALID_CREDENTIALS':
-          errorMessage = 'Usuario o contraseña incorrectos';
+          errorMessage = 'Usuario/correo o contraseña incorrectos. Por favor verifica tus datos.';
           break;
+          
         case 'CREDENTIALS_DISABLED':
-          errorMessage = 'Tu cuenta ha sido deshabilitada';
+          errorMessage = 'Tu cuenta ha sido deshabilitada. Por favor contacta al administrador.';
           break;
+          
         case 'INVALID_TOKEN':
         case 'INVALID_TOKEN_SIGNATURE':
-        case 'TOKEN_EXPIRED':
-          errorMessage = 'El token es inválido o ha expirado';
+          errorMessage = 'El token es inválido. Por favor solicita uno nuevo.';
           break;
+          
+        case 'TOKEN_EXPIRED':
+          errorMessage = 'El token ha expirado. Por favor solicita uno nuevo.';
+          break;
+          
+        case 'INVALID_REQUEST':
+          // Este código se usa cuando fallan las validaciones del backend
+          errorMessage = 'Verifica que el formato de usuario o correo sea correcto. Los usuarios deben tener entre 7-50 caracteres y los correos deben tener un formato válido.';
+          break;
+          
+        case 'INTERNAL_ERROR':
+          errorMessage = 'Error interno del servidor. Por favor intenta más tarde.';
+          break;
+          
         default:
-          errorMessage = serverError?.code || `Error del servidor: ${error.status}`;
+          // Si hay un mensaje específico del servidor, mostrarlo
+          if (serverError?.code) {
+            errorMessage = `Error: ${serverError.code}`;
+          } else {
+            errorMessage = `Error del servidor (${error.status})`;
+          }
       }
     }
 
-    console.error('Error en AuthService:', errorMessage);
+    console.error('Error en AuthService:', errorMessage, error);
     return throwError(() => new Error(errorMessage));
   }
 }
