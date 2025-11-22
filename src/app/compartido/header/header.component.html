@@ -1,7 +1,6 @@
 <header class="header-qorikusi">
   <div class="container-fluid">
     <div class="row align-items-center py-3">
-      
       <!-- Menú Hamburguesa (Siempre visible) -->
       <div class="col-2 col-md-1">
         <button class="btn-hamburger" (click)="toggleMenu()" aria-label="Menú">
@@ -27,20 +26,22 @@
           <!-- Carrito -->
           <a routerLink="/cart" class="icon-btn position-relative">
             <i class="fas fa-shopping-cart"></i>
-            <span class="cart-badge" *ngIf="cartItemsCount > 0">{{ cartItemsCount }}</span>
+            <span class="cart-badge" *ngIf="cartItemsCount > 0">{{
+              cartItemsCount
+            }}</span>
           </a>
 
           <!-- Usuario - Autenticado -->
           <div class="user-menu-wrapper" *ngIf="isAuthenticated">
-            <button 
-              class="icon-btn user-avatar d-none d-md-inline-flex" 
+            <button
+              class="icon-btn user-avatar d-none d-md-inline-flex"
               (click)="toggleUserMenu()"
               [class.active]="userMenuOpen"
             >
               <span class="avatar-initials">{{ getUserInitials() }}</span>
             </button>
 
-            <!-- Dropdown Menu -->
+            <!-- Dropdown Menu - Usuario Autenticado -->
             <div class="user-dropdown" [class.show]="userMenuOpen">
               <div class="user-dropdown-header">
                 <div class="user-avatar-large">
@@ -86,17 +87,71 @@
             </div>
           </div>
 
-          <!-- Usuario - No Autenticado -->
-          <a 
-            routerLink="/auth/login" 
-            class="icon-btn d-none d-md-inline-block"
-            *ngIf="!isAuthenticated"
-          >
-            <i class="fas fa-user"></i>
-          </a>
+          <!-- Usuario - NO Autenticado (INVITADO) -->
+          <div class="user-menu-wrapper" *ngIf="!isAuthenticated">
+            <button
+              class="icon-btn d-none d-md-inline-block"
+              (click)="toggleGuestMenu()"
+              [class.active]="guestMenuOpen"
+              aria-label="Menú de usuario"
+            >
+              <i class="fas fa-user"></i>
+            </button>
+
+            <!-- Dropdown Menu - Invitado -->
+            <div class="guest-dropdown" [class.show]="guestMenuOpen">
+              <div class="guest-dropdown-header">
+                <div class="guest-icon">
+                  <i class="fas fa-user-circle"></i>
+                </div>
+                <div class="guest-info">
+                  <p class="guest-title">¡Bienvenido!</p>
+                  <p class="guest-subtitle">Accede a tu cuenta</p>
+                </div>
+              </div>
+
+              <div class="guest-dropdown-divider"></div>
+
+              <ul class="guest-dropdown-menu">
+                <li>
+                  <a
+                    routerLink="/auth/login"
+                    (click)="closeGuestMenu()"
+                    class="login-btn"
+                  >
+                    <i class="fas fa-sign-in-alt me-2"></i>
+                    Iniciar Sesión
+                  </a>
+                </li>
+                <li>
+                  <a
+                    routerLink="/auth/register"
+                    (click)="closeGuestMenu()"
+                    class="register-btn"
+                  >
+                    <i class="fas fa-user-plus me-2"></i>
+                    Crear Cuenta
+                  </a>
+                </li>
+              </ul>
+
+              <div class="guest-dropdown-footer">
+                <p class="guest-benefits-title">
+                  <i class="fas fa-star me-1"></i>
+                  Beneficios de tener cuenta
+                </p>
+                <ul class="guest-benefits">
+                  <li>
+                    <i class="fas fa-check me-2"></i>Seguimiento de pedidos
+                  </li>
+                  <li><i class="fas fa-check me-2"></i>Historial de compras</li>
+                  <li><i class="fas fa-check me-2"></i>Ofertas exclusivas</li>
+                </ul>
+              </div>
+            </div>
+          </div>
         </div>
       </div>
-
     </div>
   </div>
 
@@ -117,14 +172,24 @@
       <p class="mobile-user-email">{{ currentUser?.email }}</p>
     </div>
 
+    <!-- Mensaje de Bienvenida para Invitados en Móvil -->
+    <div class="mobile-guest-info" *ngIf="!isAuthenticated">
+      <div class="mobile-guest-icon">
+        <i class="fas fa-user-circle"></i>
+      </div>
+      <p class="mobile-guest-text">¡Bienvenido a Qorikusi!</p>
+    </div>
+
     <ul class="mobile-nav-menu">
       <li><a routerLink="/" (click)="toggleMenu()">INICIO</a></li>
       <li><a routerLink="/products" (click)="toggleMenu()">PRODUCTOS</a></li>
-      <li><a routerLink="/collections" (click)="toggleMenu()">COLECCIONES</a></li>
+      <li>
+        <a routerLink="/collections" (click)="toggleMenu()">COLECCIONES</a>
+      </li>
       <li><a routerLink="/about" (click)="toggleMenu()">NOSOTROS</a></li>
       <li><a routerLink="/contact" (click)="toggleMenu()">CONTACTO</a></li>
-      
-      <!-- Opciones de Usuario en Móvil -->
+
+      <!-- Opciones de Usuario Autenticado en Móvil -->
       <li class="divider" *ngIf="isAuthenticated"></li>
       <li *ngIf="isAuthenticated">
         <a routerLink="/profile" (click)="toggleMenu()">
@@ -147,24 +212,47 @@
         </a>
       </li>
 
-      <!-- Si no está autenticado -->
+      <!-- Opciones para Invitados en Móvil -->
       <li class="divider" *ngIf="!isAuthenticated"></li>
       <li *ngIf="!isAuthenticated">
-        <a routerLink="/auth/login" (click)="toggleMenu()">
+        <a
+          routerLink="/auth/login"
+          (click)="toggleMenu()"
+          class="highlight-link"
+        >
           <i class="fas fa-sign-in-alt me-2"></i>INICIAR SESIÓN
         </a>
       </li>
       <li *ngIf="!isAuthenticated">
-        <a routerLink="/auth/register" (click)="toggleMenu()">
-          <i class="fas fa-user-plus me-2"></i>REGISTRARSE
+        <a
+          routerLink="/auth/register"
+          (click)="toggleMenu()"
+          class="highlight-link"
+        >
+          <i class="fas fa-user-plus me-2"></i>CREAR CUENTA
         </a>
       </li>
     </ul>
   </div>
 
   <!-- Overlay para cerrar menú -->
-  <div class="menu-overlay" [class.active]="menuOpen" (click)="toggleMenu()"></div>
+  <div
+    class="menu-overlay"
+    [class.active]="menuOpen"
+    (click)="toggleMenu()"
+  ></div>
 
-  <!-- Overlay para cerrar menú de usuario -->
-  <div class="user-menu-overlay" [class.active]="userMenuOpen" (click)="closeUserMenu()"></div>
+  <!-- Overlay para cerrar menú de usuario autenticado -->
+  <div
+    class="user-menu-overlay"
+    [class.active]="userMenuOpen"
+    (click)="closeUserMenu()"
+  ></div>
+
+  <!-- Overlay para cerrar menú de invitado -->
+  <div
+    class="guest-menu-overlay"
+    [class.active]="guestMenuOpen"
+    (click)="closeGuestMenu()"
+  ></div>
 </header>

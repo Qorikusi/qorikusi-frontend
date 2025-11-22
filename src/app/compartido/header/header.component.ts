@@ -15,6 +15,7 @@ import { Usuario } from '../../modelos/Usuario';
 export class HeaderComponent implements OnInit, OnDestroy {
   menuOpen = false;
   userMenuOpen = false;
+  guestMenuOpen = false; // ← NUEVO: para el menú de invitados
   cartItemsCount = 0;
   
   // Usuario autenticado
@@ -46,10 +47,21 @@ export class HeaderComponent implements OnInit, OnDestroy {
 
   toggleUserMenu() {
     this.userMenuOpen = !this.userMenuOpen;
+    this.guestMenuOpen = false; // Cerrar el otro menú
   }
 
   closeUserMenu() {
     this.userMenuOpen = false;
+  }
+
+  // ← NUEVO: Métodos para el menú de invitados
+  toggleGuestMenu() {
+    this.guestMenuOpen = !this.guestMenuOpen;
+    this.userMenuOpen = false; // Cerrar el otro menú
+  }
+
+  closeGuestMenu() {
+    this.guestMenuOpen = false;
   }
 
   logout() {
