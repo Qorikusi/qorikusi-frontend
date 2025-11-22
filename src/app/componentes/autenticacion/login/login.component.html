@@ -1,15 +1,17 @@
 <div class="auth-page">
-  
   <div class="auth-container">
     <div class="auth-card">
       
-      <!-- Título -->
       <h2 class="auth-title">INICIAR SESIÓN</h2>
 
-      <!-- Formulario -->
+      <!-- Mensaje de Error -->
+      <div class="alert alert-danger" *ngIf="errorMessage" role="alert">
+        <i class="fas fa-exclamation-circle me-2"></i>
+        {{ errorMessage }}
+      </div>
+
       <form [formGroup]="loginForm" (ngSubmit)="onSubmit()">
         
-        <!-- Usuario o Email -->
         <div class="form-group mb-3">
           <label for="username" class="form-label">Nombre de usuario o correo electrónico</label>
           <input 
@@ -17,14 +19,13 @@
             class="form-control" 
             id="username"
             formControlName="username"
-            [class.is-invalid]="loginForm.get('username')?.invalid && loginForm.get('username')?.touched"
+            [class.is-invalid]="username?.invalid && username?.touched"
           >
-          <div class="invalid-feedback" *ngIf="loginForm.get('username')?.invalid && loginForm.get('username')?.touched">
+          <div class="invalid-feedback" *ngIf="username?.invalid && username?.touched">
             Por favor ingresa tu usuario o correo electrónico
           </div>
         </div>
 
-        <!-- Contraseña -->
         <div class="form-group mb-3">
           <label for="password" class="form-label">Contraseña</label>
           <input 
@@ -32,14 +33,13 @@
             class="form-control" 
             id="password"
             formControlName="password"
-            [class.is-invalid]="loginForm.get('password')?.invalid && loginForm.get('password')?.touched"
+            [class.is-invalid]="password?.invalid && password?.touched"
           >
-          <div class="invalid-feedback" *ngIf="loginForm.get('password')?.invalid && loginForm.get('password')?.touched">
+          <div class="invalid-feedback" *ngIf="password?.invalid && password?.touched">
             Por favor ingresa tu contraseña
           </div>
         </div>
 
-        <!-- Recordarme -->
         <div class="form-check mb-3">
           <input 
             class="form-check-input" 
@@ -52,26 +52,26 @@
           </label>
         </div>
 
-        <!-- Botón Ingresar -->
         <button 
           type="submit" 
           class="btn btn-auth-primary w-100 mb-3"
-          [disabled]="loginForm.invalid"
+          [disabled]="loginForm.invalid || loading"
         >
-          INGRESAR
+          <span *ngIf="!loading">INGRESAR</span>
+          <span *ngIf="loading">
+            <i class="fas fa-spinner fa-spin me-2"></i>
+            Iniciando sesión...
+          </span>
         </button>
 
-        <!-- Olvidé mi contraseña -->
         <div class="text-center">
           <a href="#" class="forgot-password">¿Olvidaste la contraseña?</a>
         </div>
 
-        <!-- Separador -->
         <div class="auth-divider">
           <span>O</span>
         </div>
 
-        <!-- Enlace a Registro -->
         <div class="text-center">
           <p class="mb-0">¿No tienes una cuenta? <a routerLink="/auth/register" class="link-register">Regístrate aquí</a></p>
         </div>
@@ -80,5 +80,4 @@
 
     </div>
   </div>
-
 </div>
