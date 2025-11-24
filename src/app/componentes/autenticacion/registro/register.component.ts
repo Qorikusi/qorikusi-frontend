@@ -5,9 +5,71 @@ import {
   FormGroup,
   Validators,
   ReactiveFormsModule,
+  AbstractControl,
+  ValidationErrors,
+  ValidatorFn,
 } from '@angular/forms';
 import { Router, RouterLink } from '@angular/router';
 import { AuthService } from '../../../servicio/auth.service';
+
+// ========================================
+// VALIDADOR PERSONALIZADO DE CONTRASEÑA
+// ========================================
+
+/**
+ * Validador que verifica que la contraseña cumpla con todos los requisitos:
+ * - Al menos 8 caracteres
+ * - Al menos una mayúscula
+ * - Al menos una minúscula
+ * - Al menos un número
+ * - Al menos un carácter especial
+ */
+export function passwordStrengthValidator(): ValidatorFn {
+  return (control: AbstractControl): ValidationErrors | null => {
+    const value = control.value;
+
+    if (!value) {
+      return null; // Si está vacío, el Validators.required se encargará
+    }
+
+    // Objeto para almacenar los errores
+    const errors: ValidationErrors = {};
+
+    // Validar longitud mínima (8 caracteres)
+    if (value.length < 8) {
+      errors['minLength'] = true;
+    }
+
+    // Validar que tenga al menos una mayúscula
+    if (!/[A-Z]/.test(value)) {
+      errors['noUpperCase'] = true;
+    }
+
+    // Validar que tenga al menos una minúscula
+    if (!/[a-z]/.test(value)) {
+      errors['noLowerCase'] = true;
+    }
+
+    // Validar que tenga al menos un número
+    if (!/\d/.test(value)) {
+      errors['noNumber'] = true;
+    }
+
+    // Validar que tenga al menos un carácter especial
+    if (!/[^A-Za-z0-9]/.test(value)) {
+      errors['noSpecialChar'] = true;
+    }
+
+    // Si hay algún error de complejidad, agregar el error general
+    if (errors['noUpperCase'] || errors['noLowerCase'] || errors['noNumber'] || errors['noSpecialChar']) {
+      errors['weakPassword'] = true;
+    }
+
+    // Si no hay errores, retornar null (válido)
+    // Si hay errores, retornar el objeto de errores
+    return Object.keys(errors).length > 0 ? errors : null;
+  };
+}
 
 @Component({
   selector: 'app-register',
@@ -21,6 +83,9 @@ export class RegisterComponent implements OnInit {
   loading = false;
   errorMessage = '';
   successMessage = '';
+  
+  // Variable para mostrar/ocultar contraseña
+  showPassword = false;
 
   constructor(
     private fb: FormBuilder,
@@ -31,7 +96,10 @@ export class RegisterComponent implements OnInit {
   ngOnInit() {
     this.registerForm = this.fb.group({
       email: ['', [Validators.required, Validators.email]],
-      password: ['', [Validators.required, Validators.minLength(6)]],
+      password: ['', [
+        Validators.required,
+        passwordStrengthValidator() // ← Nuestro validador personalizado
+      ]],
       acceptTerms: [false, [Validators.requiredTrue]],
     });
   }
@@ -52,7 +120,7 @@ export class RegisterComponent implements OnInit {
 
     this.authService.registerClient(email, password).subscribe({
       next: () => {
-        this.successMessage = '¡Registro exitoso! Redirigiendo al login...';
+        this.successMessage = '¡Registro exitoso! Ahora puedes iniciar sesión con tu correo electrónico.';
         console.log('Registro exitoso');
 
         setTimeout(() => {
@@ -70,6 +138,12 @@ export class RegisterComponent implements OnInit {
     });
   }
 
+  // Toggle para mostrar/ocultar contraseña
+  togglePasswordVisibility() {
+    this.showPassword = !this.showPassword;
+  }
+
+  // Getters para acceder fácilmente a los controles del formulario
   get email() {
     return this.registerForm.get('email');
   }
@@ -80,5 +154,26 @@ export class RegisterComponent implements OnInit {
 
   get acceptTerms() {
     return this.registerForm.get('acceptTerms');
+  }
+  
+  // Métodos helper para verificar requisitos de contraseña
+  hasMinLength(): boolean {
+    return this.password?.value?.length >= 8;
+  }
+  
+  hasUpperCase(): boolean {
+    return /[A-Z]/.test(this.password?.value);
+  }
+  
+  hasLowerCase(): boolean {
+    return /[a-z]/.test(this.password?.value);
+  }
+  
+  hasNumber(): boolean {
+    return /\d/.test(this.password?.value);
+  }
+  
+  hasSpecialChar(): boolean {
+    return /[^A-Za-z0-9]/.test(this.password?.value);
   }
 }

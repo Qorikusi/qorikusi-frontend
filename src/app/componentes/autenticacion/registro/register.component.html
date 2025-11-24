@@ -16,6 +16,7 @@
       </div>
 
       <form [formGroup]="registerForm" (ngSubmit)="onSubmit()">
+        <!-- CAMPO EMAIL -->
         <div class="form-group mb-3">
           <label for="email" class="form-label"
             >Dirección de correo electrónico</label
@@ -25,6 +26,7 @@
             class="form-control"
             id="email"
             formControlName="email"
+            placeholder="correo@ejemplo.com"
             [class.is-invalid]="email?.invalid && email?.touched"
           />
           <div
@@ -41,29 +43,110 @@
           </div>
         </div>
 
+        <!-- CAMPO CONTRASEÑA -->
         <div class="form-group mb-3">
           <label for="password" class="form-label">Contraseña</label>
-          <input
-            type="password"
-            class="form-control"
-            id="password"
-            formControlName="password"
-            [class.is-invalid]="password?.invalid && password?.touched"
-          />
+          <div class="password-input-wrapper">
+            <input
+              [type]="showPassword ? 'text' : 'password'"
+              class="form-control"
+              id="password"
+              formControlName="password"
+              placeholder="••••••••"
+              [class.is-invalid]="password?.invalid && password?.touched"
+            />
+            <button
+              type="button"
+              class="btn-toggle-password"
+              (click)="togglePasswordVisibility()"
+              [attr.aria-label]="
+                showPassword ? 'Ocultar contraseña' : 'Mostrar contraseña'
+              "
+            >
+              <i
+                class="fas"
+                [class.fa-eye]="!showPassword"
+                [class.fa-eye-slash]="showPassword"
+              ></i>
+            </button>
+          </div>
+
+          <!-- MENSAJES DE ERROR ESPECÍFICOS -->
+
+          <!-- Error: Campo requerido -->
           <div
-            class="invalid-feedback"
+            class="invalid-feedback d-block"
             *ngIf="password?.errors?.['required'] && password?.touched"
           >
+            <i class="fas fa-times-circle me-1"></i>
             Por favor ingresa una contraseña
           </div>
+
+          <!-- Error: Longitud mínima -->
           <div
-            class="invalid-feedback"
-            *ngIf="password?.errors?.['minlength'] && password?.touched"
+            class="invalid-feedback d-block"
+            *ngIf="password?.errors?.['minLength'] && !password?.errors?.['required'] && password?.touched"
           >
-            La contraseña debe tener al menos 6 caracteres
+            <i class="fas fa-times-circle me-1"></i>
+            La contraseña debe tener al menos 8 caracteres
+          </div>
+
+          <!-- Error: Complejidad de contraseña -->
+          <div
+            class="invalid-feedback d-block"
+            *ngIf="password?.errors?.['weakPassword'] && !password?.errors?.['minLength'] && !password?.errors?.['required'] && password?.touched"
+          >
+            <i class="fas fa-times-circle me-1"></i>
+            La contraseña debe contener mayúsculas, minúsculas, números y
+            caracteres especiales
+          </div>
+
+          <!-- INDICADORES DE REQUISITOS DE CONTRASEÑA -->
+          <div class="password-requirements" *ngIf="password?.value">
+            <small class="requirement-title">Requisitos de contraseña:</small>
+            <ul class="requirements-list">
+              <li
+                [class.valid]="hasMinLength()"
+                [class.invalid]="!hasMinLength()"
+              >
+                <i class="fas fa-check-circle" *ngIf="hasMinLength()"></i>
+                <i class="fas fa-times-circle" *ngIf="!hasMinLength()"></i>
+                Al menos 8 caracteres
+              </li>
+              <li
+                [class.valid]="hasUpperCase()"
+                [class.invalid]="!hasUpperCase()"
+              >
+                <i class="fas fa-check-circle" *ngIf="hasUpperCase()"></i>
+                <i class="fas fa-times-circle" *ngIf="!hasUpperCase()"></i>
+                Una letra mayúscula
+              </li>
+              <li
+                [class.valid]="hasLowerCase()"
+                [class.invalid]="!hasLowerCase()"
+              >
+                <i class="fas fa-check-circle" *ngIf="hasLowerCase()"></i>
+                <i class="fas fa-times-circle" *ngIf="!hasLowerCase()"></i>
+                Una letra minúscula
+              </li>
+              <li [class.valid]="hasNumber()" [class.invalid]="!hasNumber()">
+                <i class="fas fa-check-circle" *ngIf="hasNumber()"></i>
+                <i class="fas fa-times-circle" *ngIf="!hasNumber()"></i>
+                Un número
+              </li>
+              <li
+                [class.valid]="hasSpecialChar()"
+                [class.invalid]="!hasSpecialChar()"
+              >
+                <i class="fas fa-check-circle" *ngIf="hasSpecialChar()"></i>
+                <i class="fas fa-times-circle" *ngIf="!hasSpecialChar()"></i>
+                Un carácter especial (!&#64;#$%^&*)
+              </li>
+            </ul>
           </div>
         </div>
 
+        <!-- INFORMACIÓN DE PRIVACIDAD -->
         <div class="privacy-info mb-3">
           <p class="privacy-text">
             Tus datos personales se utilizarán para procesar tu pedido, mejorar
@@ -72,6 +155,7 @@
           </p>
         </div>
 
+        <!-- CHECKBOX TÉRMINOS Y CONDICIONES -->
         <div class="form-check mb-4">
           <input
             class="form-check-input"
@@ -93,6 +177,7 @@
           </div>
         </div>
 
+        <!-- BOTÓN REGISTRARSE -->
         <button
           type="submit"
           class="btn btn-auth-primary w-100 mb-3"
