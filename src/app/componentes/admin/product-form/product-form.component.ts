@@ -5,6 +5,7 @@ import { ActivatedRoute, Router, RouterLink } from '@angular/router';
 import { ProductoService } from '../../../servicio/producto.service';
 import { CategoriaService } from '../../../servicio/categoria.service';
 import { ProductoRequest } from '../../../modelos/Producto';
+import { Categoria } from '../../../modelos/Categoria';
 
 @Component({
   selector: 'app-product-form',
@@ -16,7 +17,7 @@ import { ProductoRequest } from '../../../modelos/Producto';
 export class ProductFormComponent implements OnInit {
 
   productForm: FormGroup;
-  categorias: string[] = [];
+  categorias: Categoria[] = [];  // Ahora almacenamos objetos Categoria completos
   energiasLunares: string[] = [
     'Luna Nueva',
     'Luna Creciente',
@@ -47,7 +48,7 @@ export class ProductFormComponent implements OnInit {
       descripcion: ['', [Validators.required, Validators.minLength(10), Validators.maxLength(500)]],
       precio: [0, [Validators.required, Validators.min(0.01)]],
       stock: [0, [Validators.required, Validators.min(0)]],
-      categoria: ['', Validators.required],
+      categoria: [null, Validators.required],  // Ahora será un número (ID)
       energiaLunar: [''],
       imagen: ['', Validators.required]
     });
@@ -70,12 +71,12 @@ export class ProductFormComponent implements OnInit {
   cargarCategorias() {
     this.categoriaService.obtenerCategorias().subscribe({
       next: (categorias) => {
-        this.categorias = categorias.map(c => c.nombre);
+        this.categorias = categorias;
+        console.log('Categorías cargadas:', categorias);
       },
       error: (error) => {
         console.error('Error al cargar categorías:', error);
-        // Si falla, usar categorías por defecto
-        this.categorias = ['Collares', 'Pulseras', 'Anillos', 'Aretes', 'Sets'];
+        this.error = 'No se pudieron cargar las categorías. Asegúrate de tener categorías creadas en el backend.';
       }
     });
   }
@@ -86,12 +87,15 @@ export class ProductFormComponent implements OnInit {
 
     this.productoService.obtenerProductoPorId(uuid).subscribe({
       next: (producto) => {
+        // Buscar el ID de la categoría por su nombre
+        const categoriaEncontrada = this.categorias.find(c => c.nombre === producto.categoria);
+        
         this.productForm.patchValue({
           nombre: producto.nombre,
           descripcion: producto.descripcion,
           precio: producto.precio,
           stock: producto.stock,
-          categoria: producto.categoria,
+          categoria: categoriaEncontrada ? categoriaEncontrada.idCategoria : null,
           energiaLunar: producto.energiaLunar || '',
           imagen: producto.imagen
         });
@@ -115,15 +119,19 @@ export class ProductFormComponent implements OnInit {
     this.error = '';
 
     const formValue = this.productForm.value;
+    
+    // Construir el objeto ProductoRequest con el ID de categoría
     const productoData: ProductoRequest = {
       nombre: formValue.nombre.trim(),
       descripcion: formValue.descripcion.trim(),
       precio: parseFloat(formValue.precio),
       stock: parseInt(formValue.stock, 10),
-      categoria: formValue.categoria,
+      categoria: parseInt(formValue.categoria, 10),  // Enviar como número (ID)
       energiaLunar: formValue.energiaLunar || undefined,
       imagen: formValue.imagen.trim()
     };
+
+    console.log('Datos a enviar:', productoData);
 
     if (this.isEditMode && this.productoId) {
       // Actualizar producto existente
@@ -134,7 +142,7 @@ export class ProductFormComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al actualizar producto:', error);
-          this.error = 'No se pudo actualizar el producto';
+          this.error = 'No se pudo actualizar el producto: ' + error.message;
           this.submitting = false;
         }
       });
@@ -147,7 +155,7 @@ export class ProductFormComponent implements OnInit {
         },
         error: (error) => {
           console.error('Error al crear producto:', error);
-          this.error = 'No se pudo crear el producto';
+          this.error = 'No se pudo crear el producto: ' + error.message;
           this.submitting = false;
         }
       });

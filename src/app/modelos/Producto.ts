@@ -43,7 +43,7 @@ export interface PageResponse<T> {
 
 // Modelo para crear/actualizar productos (Admin)
 export interface ProductoRequest {
-  categoria: number; // ID de categoría
+  categoria: number; // ID de categoría (no el nombre)
   nombre: string;
   descripcion: string;
   precio: number;
@@ -54,5 +54,5 @@ export interface ProductoRequest {
 
 // Modelo para la respuesta del admin (incluye estado)
 export interface ProductoAdminResponse extends Producto {
-  estado: boolean; // "Activo" o "Inactivo"
+  estado: boolean; // true = activo, false = inactivo
 }

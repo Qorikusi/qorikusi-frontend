@@ -52,7 +52,7 @@ export class CategoriaService {
   /**
    * ✏️ Actualizar una categoría existente (requiere autenticación ADMIN)
    */
-  actualizarCategoria(id: string, categoria: { nombre: string }): Observable<Categoria> {
+  actualizarCategoria(id: number, categoria: { nombre: string }): Observable<Categoria> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.put<Categoria>(url, categoria)
       .pipe(
@@ -63,7 +63,7 @@ export class CategoriaService {
   /**
    * 🗑️ Eliminar una categoría (requiere autenticación ADMIN)
    */
-  eliminarCategoria(id: string): Observable<void> {
+  eliminarCategoria(id: number): Observable<void> {
     const url = `${this.apiUrl}/${id}`;
     return this.http.delete<void>(url)
       .pipe(
