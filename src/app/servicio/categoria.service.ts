@@ -35,6 +35,42 @@ export class CategoriaService {
     return [...new Set(categorias)].sort();
   }
 
+  // ====================================
+  // MÉTODOS DE ADMINISTRACIÓN (CRUD)
+  // ====================================
+
+  /**
+   * 📝 Crear una nueva categoría (requiere autenticación ADMIN)
+   */
+  crearCategoria(categoria: { nombre: string }): Observable<Categoria> {
+    return this.http.post<Categoria>(this.apiUrl, categoria)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * ✏️ Actualizar una categoría existente (requiere autenticación ADMIN)
+   */
+  actualizarCategoria(id: string, categoria: { nombre: string }): Observable<Categoria> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.put<Categoria>(url, categoria)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
+   * 🗑️ Eliminar una categoría (requiere autenticación ADMIN)
+   */
+  eliminarCategoria(id: string): Observable<void> {
+    const url = `${this.apiUrl}/${id}`;
+    return this.http.delete<void>(url)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
   /**
    * Manejo de errores HTTP
    */

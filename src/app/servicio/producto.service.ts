@@ -3,7 +3,7 @@ import { HttpClient, HttpErrorResponse, HttpParams } from '@angular/common/http'
 import { Observable, throwError, BehaviorSubject, of } from 'rxjs';
 import { map, catchError, tap } from 'rxjs/operators';
 import { environment } from '../../environments/environment.development';
-import { Producto, PageResponse } from '../modelos/Producto';
+import { Producto, PageResponse, ProductoRequest, ProductoAdminResponse } from '../modelos/Producto';
 
 @Injectable({
   providedIn: 'root'
@@ -212,6 +212,96 @@ export class ProductoService {
    */
   obtenerProductosCache(): Observable<Producto[]> {
     return this.productosCache$.asObservable();
+  }
+
+  // ====================================
+  // MÉTODOS DE ADMINISTRACIÓN (CRUD)
+  // ====================================
+
+  /**
+   * 📝 Crear un nuevo producto (requiere autenticación ADMIN)
+   */
+  crearProducto(producto: ProductoRequest): Observable<Producto> {
+    const url = `${environment.apiProductsUrl}/admin/products`;
+    return this.http.post<Producto>(url, producto).pipe(
+      tap(() => {
+        // Limpiar cache después de crear
+        this.productosCache$.next([]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * ✏️ Actualizar un producto existente (requiere autenticación ADMIN)
+   */
+  actualizarProducto(uuid: string, producto: ProductoRequest): Observable<Producto> {
+    const url = `${environment.apiProductsUrl}/admin/products/${uuid}`;
+    return this.http.put<Producto>(url, producto).pipe(
+      tap(() => {
+        // Limpiar cache después de actualizar
+        this.productosCache$.next([]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * 🗑️ Eliminar un producto (requiere autenticación ADMIN)
+   */
+  eliminarProducto(uuid: string): Observable<void> {
+    const url = `${environment.apiProductsUrl}/admin/products/${uuid}`;
+    return this.http.delete<void>(url).pipe(
+      tap(() => {
+        // Limpiar cache después de eliminar
+        this.productosCache$.next([]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * 🔄 Cambiar el estado de un producto (activo/inactivo)
+   * (requiere autenticación ADMIN)
+   */
+  cambiarEstadoProducto(uuid: string, activo: boolean): Observable<Producto> {
+    const url = `${environment.apiProductsUrl}/admin/products/${uuid}/estado`;
+    return this.http.patch<Producto>(url, { activo }).pipe(
+      tap(() => {
+        // Limpiar cache después de cambiar estado
+        this.productosCache$.next([]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * 📦 Actualizar stock de un producto (requiere autenticación ADMIN)
+   */
+  actualizarStock(uuid: string, nuevoStock: number): Observable<Producto> {
+    const url = `${environment.apiProductsUrl}/admin/products/${uuid}/stock`;
+    return this.http.patch<Producto>(url, { stock: nuevoStock }).pipe(
+      tap(() => {
+        // Limpiar cache después de actualizar stock
+        this.productosCache$.next([]);
+      }),
+      catchError(this.handleError)
+    );
+  }
+
+  /**
+   * 📋 Obtener todos los productos para administración (incluye inactivos)
+   * (requiere autenticación ADMIN)
+   */
+  obtenerProductosAdmin(page: number = 0, size: number = 1000): Observable<PageResponse<ProductoAdminResponse>> {
+    const url = `${environment.apiProductsUrl}/admin/products`;
+    const params = new HttpParams()
+      .set('page', page.toString())
+      .set('size', size.toString());
+    
+    return this.http.get<PageResponse<ProductoAdminResponse>>(url, { params }).pipe(
+      catchError(this.handleError)
+    );
   }
 
   /**

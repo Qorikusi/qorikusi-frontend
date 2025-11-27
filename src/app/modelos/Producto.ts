@@ -54,5 +54,5 @@ export interface ProductoRequest {
 
 // Modelo para la respuesta del admin (incluye estado)
 export interface ProductoAdminResponse extends Producto {
-  estado: string; // "Activo" o "Inactivo"
+  estado: boolean; // "Activo" o "Inactivo"
 }
