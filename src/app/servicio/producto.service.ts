@@ -70,6 +70,18 @@ export class ProductoService {
   }
 
   /**
+   * 📋 Obtener un producto por su UUID desde el endpoint de admin
+   * (requiere autenticación ADMIN - para edición)
+   */
+  obtenerProductoPorIdAdmin(uuid: string): Observable<ProductoAdminResponse> {
+    const url = `${environment.apiProductsUrl}/admin/products/${uuid}`;
+    return this.http.get<ProductoAdminResponse>(url)
+      .pipe(
+        catchError(this.handleError)
+      );
+  }
+
+  /**
    * 🔍 BÚSQUEDA DEL LADO DEL CLIENTE
    * Buscar productos por nombre (case-insensitive)
    */
@@ -234,10 +246,11 @@ export class ProductoService {
 
   /**
    * ✏️ Actualizar un producto existente (requiere autenticación ADMIN)
+   * Usa PATCH según el endpoint del backend
    */
   actualizarProducto(uuid: string, producto: ProductoRequest): Observable<Producto> {
     const url = `${environment.apiProductsUrl}/admin/products/${uuid}`;
-    return this.http.put<Producto>(url, producto).pipe(
+    return this.http.patch<Producto>(url, producto).pipe(  // PATCH es el método correcto
       tap(() => {
         // Limpiar cache después de actualizar
         this.productosCache$.next([]);

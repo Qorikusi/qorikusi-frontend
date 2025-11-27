@@ -55,7 +55,7 @@ export class ProductFormComponent implements OnInit {
   }
 
   ngOnInit() {
-    // Cargar categorías
+    // Primero cargar categorías
     this.cargarCategorias();
     
     // Verificar si es modo edición
@@ -63,7 +63,11 @@ export class ProductFormComponent implements OnInit {
       this.productoId = params.get('id');
       if (this.productoId) {
         this.isEditMode = true;
-        this.cargarProducto(this.productoId);
+        // Esperar a que las categorías se carguen antes de cargar el producto
+        // Si las categorías ya están cargadas, cargar inmediatamente
+        if (this.categorias.length > 0) {
+          this.cargarProducto(this.productoId);
+        }
       }
     });
   }
@@ -71,8 +75,20 @@ export class ProductFormComponent implements OnInit {
   cargarCategorias() {
     this.categoriaService.obtenerCategorias().subscribe({
       next: (categorias) => {
-        this.categorias = categorias;
-        console.log('Categorías cargadas:', categorias);
+        // Asegurar que los IDs sean números
+        this.categorias = categorias.map(cat => ({
+          idCategoria: typeof cat.idCategoria === 'string' 
+            ? parseInt(cat.idCategoria, 10) 
+            : cat.idCategoria,
+          nombre: cat.nombre
+        }));
+        
+        console.log('Categorías cargadas:', this.categorias);
+        
+        // Si estamos en modo edición y el producto aún no se ha cargado, cargarlo ahora
+        if (this.isEditMode && this.productoId && !this.loading) {
+          this.cargarProducto(this.productoId);
+        }
       },
       error: (error) => {
         console.error('Error al cargar categorías:', error);
@@ -85,17 +101,30 @@ export class ProductFormComponent implements OnInit {
     this.loading = true;
     this.error = '';
 
-    this.productoService.obtenerProductoPorId(uuid).subscribe({
+    // Usar el endpoint de admin para obtener el producto completo
+    this.productoService.obtenerProductoPorIdAdmin(uuid).subscribe({
       next: (producto) => {
+        console.log('Producto cargado:', producto);
+        
         // Buscar el ID de la categoría por su nombre
         const categoriaEncontrada = this.categorias.find(c => c.nombre === producto.categoria);
+        
+        // Asegurar que el ID sea un número
+        const categoriaId = categoriaEncontrada 
+          ? (typeof categoriaEncontrada.idCategoria === 'string' 
+              ? parseInt(categoriaEncontrada.idCategoria, 10) 
+              : categoriaEncontrada.idCategoria)
+          : null;
+        
+        console.log('Categoría encontrada:', categoriaEncontrada);
+        console.log('ID de categoría a usar:', categoriaId);
         
         this.productForm.patchValue({
           nombre: producto.nombre,
           descripcion: producto.descripcion,
           precio: producto.precio,
           stock: producto.stock,
-          categoria: categoriaEncontrada ? categoriaEncontrada.idCategoria : null,
+          categoria: categoriaId,
           energiaLunar: producto.energiaLunar || '',
           imagen: producto.imagen
         });
@@ -103,7 +132,7 @@ export class ProductFormComponent implements OnInit {
       },
       error: (error) => {
         console.error('Error al cargar producto:', error);
-        this.error = 'No se pudo cargar el producto';
+        this.error = 'No se pudo cargar el producto. Asegúrate de tener permisos de administrador.';
         this.loading = false;
       }
     });
