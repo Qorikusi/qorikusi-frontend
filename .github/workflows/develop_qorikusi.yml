@@ -47,6 +47,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-dist
+          path: .
+
+      - name: List files (diagnóstico)
+        run: |
+          echo "PWD: $(pwd)"
+          ls -la
+          # Debe verse index.html y assets/ aquí o en ./qorikusi-frontend si el outputPath crea subcarpeta
+          find . -maxdepth 2 -type f -name "index.html" -printf "%p\n" || true
+
       
       - name: Login to Azure
         uses: azure/login@v2
@@ -61,5 +70,5 @@ jobs:
         with:
           app-name: 'qorikusi'
           slot-name: 'Production'
-          package: ./angular-dist
+          package: .
           
