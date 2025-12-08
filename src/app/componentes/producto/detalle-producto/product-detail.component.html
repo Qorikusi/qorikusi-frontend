@@ -1,0 +1,287 @@
+<div class="product-detail-page">
+  <!-- Banner de Envío -->
+  <div class="top-banner">
+    <p class="mb-0">
+      Envío gratis a todo el Perú por compras mayores a S/. 250
+    </p>
+  </div>
+
+  <!-- Loader -->
+  <div *ngIf="loading" class="container py-5">
+    <div class="text-center py-5">
+      <div class="spinner-border text-primary" role="status">
+        <span class="visually-hidden">Cargando...</span>
+      </div>
+      <p class="mt-3">Cargando producto...</p>
+    </div>
+  </div>
+
+  <!-- Error -->
+  <div *ngIf="error" class="container py-5">
+    <div class="alert alert-danger" role="alert">
+      <i class="fas fa-exclamation-circle me-2"></i>
+      {{ error }}
+      <button class="btn btn-sm btn-outline-danger ms-3" routerLink="/products">
+        Volver al catálogo
+      </button>
+    </div>
+  </div>
+
+  <!-- Contenedor Principal -->
+  <div class="container py-5" *ngIf="!loading && !error && product">
+    <div class="row">
+      <!-- Galería de Imágenes -->
+      <div class="col-lg-6 mb-4">
+        <div class="product-gallery">
+          <!-- Thumbnails -->
+          <div class="thumbnails" *ngIf="imagenesProducto.length > 1">
+            <div
+              class="thumbnail-item"
+              *ngFor="let image of imagenesProducto; let i = index"
+              [class.active]="selectedImageIndex === i"
+              (click)="selectImage(i)"
+            >
+              <img 
+                [src]="image" 
+                [alt]="product.nombre" 
+                class="img-fluid"
+                (error)="$any($event.target).src='assets/images/placeholder-product.jpg'"
+              />
+            </div>
+          </div>
+
+          <!-- Imagen Principal -->
+          <div class="main-image">
+            <img
+              [src]="imagenesProducto[selectedImageIndex] || product.imagen"
+              [alt]="product.nombre"
+              class="img-fluid"
+              (error)="$any($event.target).src='assets/images/placeholder-product.jpg'"
+            />
+            
+            <!-- Badge de stock -->
+            <span class="badge-stock" *ngIf="esStockBajo">
+              ¡Últimas {{ product.stock }} unidades!
+            </span>
+            <span class="badge-no-stock" *ngIf="!hayStock">
+              Agotado
+            </span>
+          </div>
+        </div>
+      </div>
+
+      <!-- Información del Producto -->
+      <div class="col-lg-6">
+        <div class="product-info-section">
+          
+          <!-- Breadcrumb / Categoría -->
+          <nav class="breadcrumb-nav mb-3">
+            <a routerLink="/products" class="breadcrumb-link">Catálogo</a>
+            <span class="breadcrumb-separator">/</span>
+            <a 
+              [routerLink]="['/products']" 
+              [queryParams]="{categoria: product.categoria}"
+              class="breadcrumb-link"
+            >
+              {{ product.categoria }}
+            </a>
+          </nav>
+
+          <!-- Nombre y Precio -->
+          <h1 class="product-title">{{ product.nombre }}</h1>
+          <p class="product-price">
+            s/. {{ product.precio | number : "1.2-2" }}
+          </p>
+
+          <!-- Energía Lunar -->
+          <div class="product-lunar-badge" *ngIf="product.energiaLunar">
+            <i class="fas fa-moon me-2"></i>
+            Energía Lunar: <strong>{{ product.energiaLunar }}</strong>
+          </div>
+
+          <!-- Stock Info -->
+          <div class="stock-info">
+            <span class="stock-badge" [class.stock-disponible]="hayStock" [class.stock-agotado]="!hayStock">
+              <i class="fas" [class.fa-check-circle]="hayStock" [class.fa-times-circle]="!hayStock"></i>
+              {{ hayStock ? 'Disponible' : 'Agotado' }}
+            </span>
+            <span class="stock-quantity" *ngIf="hayStock">
+              ({{ product.stock }} unidades disponibles)
+            </span>
+          </div>
+
+          <!-- Tabs: Descripción y Tiempo de Entrega -->
+          <div class="product-tabs">
+            <ul class="nav nav-tabs" role="tablist">
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link active"
+                  data-bs-toggle="tab"
+                  data-bs-target="#description"
+                  type="button"
+                  role="tab"
+                >
+                  Descripción
+                </button>
+              </li>
+              <li class="nav-item" role="presentation">
+                <button
+                  class="nav-link"
+                  data-bs-toggle="tab"
+                  data-bs-target="#delivery"
+                  type="button"
+                  role="tab"
+                >
+                  Tiempo de entrega
+                </button>
+              </li>
+            </ul>
+
+            <div class="tab-content">
+              <!-- Tab Descripción -->
+              <div
+                class="tab-pane fade show active"
+                id="description"
+                role="tabpanel"
+              >
+                <p class="product-description">{{ product.descripcion }}</p>
+              </div>
+
+              <!-- Tab Tiempo de Entrega -->
+              <div class="tab-pane fade" id="delivery" role="tabpanel">
+                <p class="delivery-info">
+                  <i class="fas fa-shipping-fast me-2"></i>
+                  Entrega en 2-3 días hábiles en Lima Metropolitana
+                </p>
+                <p class="delivery-info">
+                  <i class="fas fa-box me-2"></i>
+                  Entrega en 5-7 días hábiles en provincias
+                </p>
+                <p class="delivery-info">
+                  <i class="fas fa-truck me-2"></i>
+                  Envío gratis por compras mayores a S/. 250
+                </p>
+              </div>
+            </div>
+          </div>
+
+          <!-- Selector de Cantidad -->
+          <div class="quantity-selector" *ngIf="hayStock">
+            <label class="quantity-label">Cantidad:</label>
+            <div class="quantity-controls">
+              <button 
+                class="btn-quantity" 
+                (click)="disminuirCantidad()"
+                [disabled]="cantidadEnCarrito <= 1"
+              >
+                <i class="fas fa-minus"></i>
+              </button>
+              <input 
+                type="number" 
+                class="quantity-input" 
+                [(ngModel)]="cantidadEnCarrito"
+                [min]="1"
+                [max]="maxCantidad"
+                readonly
+              >
+              <button 
+                class="btn-quantity" 
+                (click)="aumentarCantidad()"
+                [disabled]="cantidadEnCarrito >= maxCantidad"
+              >
+                <i class="fas fa-plus"></i>
+              </button>
+            </div>
+            <span class="max-quantity-hint" *ngIf="maxCantidad < product.stock">
+              Máximo {{ maxCantidad }} unidades por compra
+            </span>
+          </div>
+
+          <!-- Indicador si ya está en carrito -->
+          <div class="already-in-cart" *ngIf="estaEnCarrito">
+            <i class="fas fa-shopping-cart me-2"></i>
+            Ya tienes {{ cantidadActualEnCarrito }} unidad(es) en tu carrito
+          </div>
+
+          <!-- Botones de Acción -->
+          <div class="product-actions">
+            <button 
+              class="btn btn-add-cart" 
+              (click)="addToCart()"
+              [disabled]="!hayStock"
+            >
+              <i class="fas fa-shopping-cart me-2"></i>
+              {{ hayStock ? 'AÑADIR AL CARRITO' : 'PRODUCTO AGOTADO' }}
+            </button>
+            <button 
+              class="btn btn-buy-now" 
+              (click)="buyNow()"
+              [disabled]="!hayStock"
+            >
+              <i class="fas fa-bolt me-2"></i>
+              COMPRAR AHORA
+            </button>
+          </div>
+
+          <!-- Características adicionales -->
+          <div class="product-features">
+            <div class="feature-item">
+              <i class="fas fa-shield-alt"></i>
+              <span>Garantía de calidad</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-undo"></i>
+              <span>Devolución en 30 días</span>
+            </div>
+            <div class="feature-item">
+              <i class="fas fa-truck"></i>
+              <span>Envío seguro</span>
+            </div>
+          </div>
+
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Te Recomendamos -->
+  <section class="recommended-section section-padding" *ngIf="!loading && !error && recommendedProducts.length > 0">
+    <div class="container">
+      <h2 class="section-title">Te recomendamos</h2>
+      <div class="row">
+        <div
+          class="col-lg-3 col-md-6 mb-4"
+          *ngFor="let recommended of recommendedProducts"
+        >
+          <div
+            class="recommended-card"
+            [routerLink]="['/products', recommended.uuidProducto]"
+          >
+            <div class="recommended-image">
+              <img
+                [src]="recommended.imagen"
+                [alt]="recommended.nombre"
+                class="img-fluid"
+                (error)="$any($event.target).src='assets/images/placeholder-product.jpg'"
+              />
+            </div>
+            <div class="recommended-info">
+              <h5 class="recommended-name">{{ recommended.nombre }}</h5>
+              <p class="recommended-price">
+                s/. {{ recommended.precio | number : "1.2-2" }}
+              </p>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </section>
+
+  <!-- Banner Inferior -->
+  <section class="bottom-banner">
+    <div class="banner-content">
+      <h2 class="banner-logo">QORIKUSI</h2>
+      <p class="banner-tagline">"Joyas que despiertan tu luz interior"</p>
+    </div>
+  </section>
+</div>
