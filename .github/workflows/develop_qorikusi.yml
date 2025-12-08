@@ -61,5 +61,5 @@ jobs:
         with:
           app-name: 'qorikusi'
           slot-name: 'Production'
-          package: .
+          package: ./dist/qorikusi-frontend
           
