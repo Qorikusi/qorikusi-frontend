@@ -85,6 +85,9 @@
             },
             "development": {
               "buildTarget": "qorikusi-frontend:build:development"
+            },
+            "cert": {
+              "buildTarget": "qorikusi-frontend:build:cert"
             }
           },
           "defaultConfiguration": "development"

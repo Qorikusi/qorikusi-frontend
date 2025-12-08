@@ -33,7 +33,8 @@ jobs:
         uses: actions/upload-artifact@v4
         with:
           name: angular-dist
-          path: ./dist/qorikusi-frontend/browser
+          path: ./dist/qorikusi-frontend
+
 
   deploy:
     runs-on: ubuntu-latest
@@ -47,7 +48,6 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: angular-dist
-          path: .
 
       - name: List files (diagnóstico)
         run: |
@@ -70,4 +70,5 @@ jobs:
         with:
           app-name: 'qorikusi'
           slot-name: 'Production'
-          package: ./browser
+
+          package: ./angular-dist
